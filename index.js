@@ -32,14 +32,13 @@ app.post("/notify", async (req, res) => {
   }
 });
 
+const { Notification } = require("./src/db");
+
 app.post("/notify-self", async (req, res) => {
   const { message, title } = req.body;
   try {
-    console.log({
-      message,
-      to: process.env.MAIL_RECEIVER,
-      from: process.env.MAIL_SENDER,
-    });
+    const n = new Notification({ title, message });
+    await n.save();
     await sgMail.send({
       from: process.env.MAIL_SENDER,
       to: process.env.MAIL_RECEIVER,
