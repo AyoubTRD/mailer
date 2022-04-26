@@ -14,9 +14,32 @@ app.use(bodyParser.json());
 
 const sgMail = require("@sendgrid/mail");
 
+app.post("/notify", async (req, res) => {
+  const { message, title, receiver } = req.body;
+  try {
+    await sgMail.send({
+      from: process.env.MAIL_SENDER,
+      to: receiver,
+      subject: title,
+      html: message,
+    });
+    res.send({
+      status: "success",
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).send({ error: e });
+  }
+});
+
 app.post("/notify-self", async (req, res) => {
   const { message, title } = req.body;
   try {
+    console.log({
+      message,
+      to: process.env.MAIL_RECEIVER,
+      from: process.env.MAIL_SENDER,
+    });
     await sgMail.send({
       from: process.env.MAIL_SENDER,
       to: process.env.MAIL_RECEIVER,
